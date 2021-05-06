@@ -1,0 +1,6 @@
+pandas
+configparser
+python-lambda
+boto3
+requests
+yfinance

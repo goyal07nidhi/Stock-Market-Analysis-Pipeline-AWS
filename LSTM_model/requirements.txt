@@ -1,0 +1,6 @@
+boto3
+tensorflow-text
+tensorflow==2.2
+scikit-learn
+numpy
+pandas

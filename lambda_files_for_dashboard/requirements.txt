@@ -1,0 +1,6 @@
+pandas
+yfinance
+configparser
+python-lambda
+boto3
+s3fs

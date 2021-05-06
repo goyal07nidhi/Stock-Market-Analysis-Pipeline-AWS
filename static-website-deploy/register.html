@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<link rel="stylesheet" href="css/style.css">
+	<link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
+	<title>Register</title>
+</head>
+
+<style>
+body {
+        background-color: #F3EBF6;
+        font-family: 'Ubuntu', sans-serif;
+    }
+    
+    .main {
+        background-color: #FFFFFF;
+        width: 400px;
+        height: 450px;
+        margin: 7em auto;
+        border-radius: 1.5em;
+        box-shadow: 0px 11px 35px 2px rgba(0, 0, 0, 0.14);
+    }
+    
+    .sign {
+        padding-top: 40px;
+        color: #8C55AA;
+        font-family: 'Ubuntu', sans-serif;
+        font-weight: bold;
+        font-size: 23px;
+    }
+    
+    .un {
+    width: 76%;
+    color: rgb(38, 50, 56);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 1px;
+    background: rgba(136, 126, 126, 0.04);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    outline: none;
+    box-sizing: border-box;
+    border: 2px solid rgba(0, 0, 0, 0.02);
+    margin-bottom: 50px;
+    margin-left: 46px;
+    text-align: center;
+    margin-bottom: 27px;
+    font-family: 'Ubuntu', sans-serif;
+    }
+    
+    form.form1 {
+        padding-top: 40px;
+    }
+    
+    .pass {
+            width: 76%;
+    color: rgb(38, 50, 56);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 1px;
+    background: rgba(136, 126, 126, 0.04);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    outline: none;
+    box-sizing: border-box;
+    border: 2px solid rgba(0, 0, 0, 0.02);
+    margin-bottom: 50px;
+    margin-left: 46px;
+    text-align: center;
+    margin-bottom: 27px;
+    font-family: 'Ubuntu', sans-serif;
+    }
+    
+   
+    .un:focus, .pass:focus {
+        border: 2px solid rgba(0, 0, 0, 0.18) !important;
+        
+    }
+    
+    .submit {
+      cursor: pointer;
+        border-radius: 5em;
+        color: #fff;
+        background: linear-gradient(to right, #9C27B0, #E040FB);
+        border: 0;
+        padding-left: 40px;
+        padding-right: 40px;
+        padding-bottom: 10px;
+        padding-top: 10px;
+        font-family: 'Ubuntu', sans-serif;
+        margin-left: 35%;
+        font-size: 13px;
+        box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+    }
+    
+    .forgot {
+        text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
+        color: #E1BEE7;
+        padding-top: 15px;
+    }
+    
+    a {
+        text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
+        color: #E1BEE7;
+        text-decoration: none
+    }
+    
+    @media (max-width: 600px) {
+        .main {
+            border-radius: 0px;
+        }
+</style>
+
+
+<body>
+    <script src="./script/jquery.min.js"></script>	
+    <script src="./script/aws-sdk-2.487.0.min.js"></script>
+    <script src="./script/aws-cognito-sdk.min.js"></script>
+    <script src="./script/amazon-cognito-identity.min.js"></script>
+
+    <style>
+    .loader {
+        border: 16px solid #f3f3f3; /* Light grey */
+        border-top: 16px solid #3498db; /* Blue */
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    </style>
+	
+	<div class="main">
+    <p class="sign" align="center">Register</p>
+    
+    <input id="emailInput" class="un " type="text" align="center" placeholder="Email">
+    <input id="userNameInput" class="un " type="text" align="center" placeholder="Username">
+    <input id="passwordInput" class="pass" type="password" align="center" placeholder="Password">
+	<input id="confirmPasswordInput" class="pass" type="password" align="center" placeholder="Confirm Password">
+	<input id="verificationCodeInput" class="un " type="text" align="center" placeholder="Verification Code">
+	
+    <input id="registerButton" class="submit" type="button" align="center" value="Register" onclick="register()"> 
+	<input id="verifyCodeButton" class="submit" type="button" align="center" value="Verify" onclick="verifyCode()">
+    <p>
+        <div align="center">
+            <span id="error"></span>
+        </div>
+    </p>
+    <div id="loader" class="loader" style="display:none"></div>
+
+    
+
+    <script>
+
+        //=============== AWS IDs ===============
+        var userPoolId = '';
+        var clientId = '';
+        var region = '';
+        var identityPoolId = '';
+        //=============== AWS IDs ===============
+
+        var cognitoUser;
+        var idToken;
+        var userPool;
+        
+        var poolData = { 
+            UserPoolId : userPoolId,
+            ClientId : clientId
+        };
+
+		
+		getCurrentLoggedInSession();
+		logOut();
+		switchToRegisterView();
+		
+		
+		function switchToVerificationCodeView(){
+            $("#emailInput").hide();
+            $("#userNameInput").hide();
+            $("#passwordInput").hide();
+            $("#confirmPasswordInput").hide();
+            $("#registerButton").hide();
+            $("#verificationCodeInput").show();
+            $("#verifyCodeButton").show();
+        }
+		
+		function switchToRegisterView(){
+            $("#emailInput").show();
+            $("#userNameInput").show();
+            $("#passwordInput").show();
+            $("#confirmPasswordInput").show();
+            $("#registerButton").show();
+            $("#verificationCodeInput").hide();
+            $("#verifyCodeButton").hide();
+        }
+		
+        /*
+        Starting point for user logout flow
+        */
+        function logOut(){
+            if (cognitoUser != null) {
+
+                $("#loader").show();
+                cognitoUser.signOut();
+                logMessage('Logged out!');
+                $("#loader").hide();
+            }
+        }
+
+
+        /*
+        Starting point for user registration flow with input validation
+        */
+        function register(){
+            var error = document.getElementById("error")		
+            if( !$('#emailInput').val() || !$('#userNameInput').val()  || !$('#passwordInput').val() || !$('#confirmPasswordInput').val() ) {
+                    logMessage('Please fill all the fields!');
+                    error.textContent = 'Please enter all the details!'
+                    error.style.color = "red"
+            }else{
+                if($('#passwordInput').val() == $('#confirmPasswordInput').val()){
+                    registerUser($('#emailInput').val(), $('#userNameInput').val(), $('#passwordInput').val());
+					
+                }else{
+                    logMessage('Confirm password failed!');
+                }
+                
+            }
+        }
+
+        
+        /*
+        User registration using AWS Cognito
+        */
+        function registerUser(email, username, password){
+            var attributeList = [];
+            
+            var dataEmail = {
+                Name : 'email',
+                Value : email
+            };
+
+            var attributeEmail = new AmazonCognitoIdentity.CognitoUserAttribute(dataEmail);
+
+            attributeList.push(attributeEmail);
+
+            $("#loader").show();
+            userPool.signUp(username, password, attributeList, null, function(err, result){
+                if (err) {
+                    logMessage(err.message);
+                }else{
+						cognitoUser = result.user;
+						logMessage('Registration Successful!');
+						logMessage('Username is: ' + cognitoUser.getUsername());
+						switchToVerificationCodeView();
+
+                }
+                $("#loader").hide();
+            });
+        }
+
+		/*
+        Starting point for user verification using AWS Cognito with input validation
+        */
+        function verifyCode(){
+            if( !$('#verificationCodeInput').val() ) {
+                logMessage('Please enter verification field!');
+            }else{
+                $("#loader").show();
+                cognitoUser.confirmRegistration($('#verificationCodeInput').val(), true, function(err, result) {
+                    if (err) {
+                        logMessage(err.message);
+                    }else{
+                        logMessage('Successfully verified code!');
+                        window.location = 'home.html'
+                    }
+                    
+                    $("#loader").hide();
+                });
+            }
+        }
+        
+
+        
+        /*
+        If user has logged in before, get the previous session so user doesn't need to log in again.
+        */
+        function getCurrentLoggedInSession(){
+
+            $("#loader").show();
+            userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+            cognitoUser = userPool.getCurrentUser();
+			
+
+            if(cognitoUser != null){
+				cognitoUser.signOut;
+            }else{
+                logMessage('Session expired. Please log in again.');
+                $("#loader").hide();
+            }
+
+        }
+
+        /*
+        This is a logging method that will be used throught the application
+        */
+        function logMessage(message){
+            $('#log').append(message + '</br>');
+        }
+    </script>
+
+</body>
+</html>
