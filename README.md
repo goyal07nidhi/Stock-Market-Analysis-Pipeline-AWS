@@ -4,7 +4,7 @@
 
 #### Quick Links
 
-[Project Presentation](https://codelabs-preview.appspot.com/?file_id=13Hv8gckEHooy4swCCXDuDKyrL-2J_BWyeBuB82hu1Zw#0) <br /> s
+[Project Presentation](https://codelabs-preview.appspot.com/?file_id=13Hv8gckEHooy4swCCXDuDKyrL-2J_BWyeBuB82hu1Zw#0) <br /> 
 [Web Application](http://stock-website-team6.s3-website-us-east-1.amazonaws.com/) <br /> 
 [Test Cases](https://codelabs-preview.appspot.com/?file_id=1-6XEDP7HqJkJHIFf83E6HPgncf_v23PfY46ktEMGPuw#0) <br />
 [Docker image](https://hub.docker.com/r/nidhi2019/stock-analysis-lstm-model) <br /> 
